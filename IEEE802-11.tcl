@@ -8,8 +8,8 @@
   set val(layer2)          LL                        ;# Link Layer
   set val(drop)            Queue/DropTail/PriQueue   ;# Queue type
   set val(fileSize)          50                      ;# Queue size
-  set val(wlan0)           Phy/WirelessPhyExt           ;# DSSS
-  set val(mac)             Mac/802_11Ext                ;# MAC Type
+  set val(wlan0)           Phy/WirelessPhy           ;# DSSS
+  set val(mac)             Mac/802_11                ;# MAC Type
   set val(routP)           AODV                      ;# Routing Protocol
  if { $val(routP) == "DSR" } {                       ;# Only DSR
   set val(drop)            CMUPriQueue		 
