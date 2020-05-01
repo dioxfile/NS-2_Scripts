@@ -10,13 +10,13 @@
   set val(fileSize)          50                      ;# Queue size
   set val(wlan0)           Phy/WirelessPhy           ;# DSSS
   set val(mac)             Mac/802_11                ;# MAC Type
-  set val(routP)           AODV                      ;# Routing Protocol
+  set val(routP)           OLSR                      ;# Routing Protocol
  if { $val(routP) == "DSR" } {                       ;# Only DSR
   set val(drop)            CMUPriQueue		 
   } else {
   set val(drop)            Queue/DropTail/PriQueue   ;# FIFO Drop Queue
   }                                                  
-  set val(node_)              10                      ;# Node Number
+  set val(node_)             50                      ;# Node Number
   set val(x)               1000                      ;# Axis X 
   set val(y)               1000                      ;# Axis Y
   set val(TX)                 1.2W                   ;# Default NS2 - 0.400 -> 0,000509W/PKT
@@ -86,7 +86,7 @@ for {set i 0} {$i < $val(node_)} {incr i} {
 
 ################Starting Mobility Model and Traffic Model###############
 puts "Starting Random WayPoint (eg., file mobility.tcl)."
-source "10-nodes_statics.tcl" 
+source "mobility.tcl" 
 puts "Starting Traffic"
 source "traffic.tcl"
 
