@@ -85,7 +85,7 @@ for {set i 0} {$i < $val(node_)} {incr i} {
 }
 
 ################Starting Mobility Model and Traffic Model###############
-puts "Starting Random WayPoint (eg., file mobility.tcl)."
+puts "Starting Random WayPoint (eg., if traffic file is mobility.tcl)."
 source "10-nodes_statics.tcl" 
 puts "Starting Traffic"
 source "traffic.tcl"
