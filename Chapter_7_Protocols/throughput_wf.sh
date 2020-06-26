@@ -1,44 +1,59 @@
-#!/bin/bash
-echo "Cleanning Trace..."
-cat TRACE_Arquivo.tr | sed 's/\[//g' | sed 's/\]//g' | sed 's/\:/ /g' \
-| awk -F" " '{ {if($2 <= 60.000000000) {print}}}' > Trace_Cleaned_Sujo.tr 
-cat Trace_Cleaned_Sujo.tr | uniq > Trace_Cleaned.tr
-
-## Quantity of Couple Sources/Destinies Ex.: $(seq 0 1) == 2
-for sim in $(seq 0 1);
-do
-if [ $sim == 0 ]; then
-    s=35
-    d=3
-else
-    s=49
-    d=16
+#!/bin/dash
+FILE="$1"
+PACKET_SIZE="$2"
+NODE="$3"
+if [ -z "$FILE" ]; then
+  echo "USAGE: ./throughput_calc.sh <FILE.tr> <PACKET_SIZE> <NODE_N>"
+  exit 1
 fi
-cat Trace_Cleaned.tr | awk -v fromNode=$s -v toNode=$d -F " " 'BEGIN {
-lineCount = 0;totalBits = 0;
+if [ -z "$PACKET_SIZE" ]; then
+  echo "USAGE: ./throughput_calc.sh <FILE.tr> <PACKET_SIZE> <NODE_N>"
+  exit 1
+fi
+if [ -z "$NODE" ]; then
+  echo "USAGE: ./throughput_calc.sh <FILE.tr> <PACKET_SIZE> <NODE_N>"
+  exit 1
+fi
+NODE_N=`expr $NODE - 1`
+rm -r Throughput/
+mkdir -pv Throughput
+cat $FILE | sed 's/\[//g' | sed 's/\]//g' | sed 's/\_//g' | \
+sed 's/\:/ /g' > Trace_Cleaned.tr
+egrep "^[sr].*AGT.*" Trace_Cleaned.tr > Trace_R_S.tr 
+for conta in $(seq 0 $NODE_N); do 
+cat Trace_R_S.tr | awk -F " " 'BEGIN{ 
+lineCount = 0;
+totalBits = 0
+duration = 0;
 }
-/^r/&&$4=="AGT"&&$24==fromNode&&$26==toNode {
-    totalBits += 8*($8-20);
-    if ( lineCount==0 ) {
-        timeBegin = $2; lineCount++;
-    } else {
-        timeEnd = $2;
-    };
-};
+{if($1=="s" && lineCount==0){ 
+	timeBegin = $2; lineCount++
+} else {
+	timeEnd = $2;
+}}
+/^r/&&$4=="AGT"&&$24=="'$conta'"{
+	if ($8=="'$PACKET_SIZE'") {
+		totalBits += $8-20;
+   } else {
+		totalBits += $8;
+   };};
 END{
-    duration = timeEnd-timeBegin;
-    print "Number of records is " NR;
-    print "Output: ";
-    print "Transmission: N" fromNode "->N" toNode; 
-    print "  - Total transmitted bits = " totalBits " bits";
-    print "  - duration = " duration " s"; 
-    print "  - Thoughput = "  totalBits/duration/1e3 " kbps.";     
-};'
+duration = timeEnd-timeBegin;
+	if(duration > 0 ) { 
+		Thoughput = (totalBits*8)/duration/1e3;
+		printf("%3.5f",Thoughput);
+	}
+};' > Throughput/Throughput_$conta.tr
+if [ -s Throughput/Throughput_$conta.tr ]; then
+awk -F" " '{{if($1!=0.0){{print "Node""'$conta'" " : " $1}}}}' \
+Throughput/Throughput_$conta.tr >> Throughput/mediaV.tr
+fi
 done;
+echo "## THROUGHPUT ##"
+cat Throughput/mediaV.tr
 ######   Dropped Packet Calculation   ######
 #/// Level 1
 #Print file with all packages marked with events 's' and 'r'
-egrep "^[sr].*AGT.*" Trace_Cleaned.tr > Trace_R_S.tr 
 cat Trace_R_S.tr | awk -F " " '{   
 	if($1 == "s" && $4 == "AGT"){
 		{print}		
@@ -57,7 +72,7 @@ cat Trace_R_S.tr | awk -F " " '{
 export R=$(awk -F" " 'END { print NR }' R.tr)
 ######      END Dropped Packet Calculation   ########
 PLR=`expr $S - $R`
-printf "\n\n\n"
+printf "\n"
 echo "#####   DROPPED PACKETS   #####"
 echo "  - Total Packets Generated = $S" ;
 echo "  - Packet Loss Rate (PDR) = $PLR";
