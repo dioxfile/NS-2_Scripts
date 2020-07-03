@@ -1,19 +1,27 @@
-#!/bin/bash
+#!/bin/dash
+FILE="$1"
+NODE="$2"
+if [ -z "$FILE" ]; then
+  echo "USAGE: ./fwd_calc.sh <FILE.tr> <NODE_N>"
+  exit 1
+fi
+if [ -z "$NODE" ]; then
+  echo "USAGE: ./fwd_calc.sh <FILE.tr> <NODE_N>"
+  exit 1
+fi
+NODE_N=`expr $NODE - 1`
+rm -r Forward/
 mkdir -pv Forward
-cat TREACE_FILE.tr | sed 's/\[//g' | sed 's/\]//g' | sed 's/\_//g' \
-| sed 's/\:/ /g' \
-| awk -F" " '{ {if($2 <= 60.000000000) {print}}}' > Trace_Cleaned_Sujo.tr 
-cat Trace_Cleaned_Sujo.tr | uniq > Trace_Cleaned.tr
+cat $FILE | sed 's/\[//g' | sed 's/\]//g' | sed 's/\_//g' \
+| sed 's/\:/ /g' > Trace_Cleaned.tr
 cat Trace_Cleaned.tr | egrep "^f.*" | awk -F" " '{if($7=="cbr" \
 	|| $7=="tcp") {{print}}}'> Forward/FWD_ALL.tr	
 awk -F" " 'END { print NR }' Forward/FWD_ALL.tr > Forward/Forward_ALL_Number.tr
-for conta in $(seq 0 59); do
+for conta in $(seq 0 $NODE_N); do
 cat Forward/FWD_ALL.tr | awk -F" " '{
 	if($3=="'$conta'") {print}}' > Forward/FWD_ALL_By_$conta.f
 if [ ! -s Forward/FWD_ALL_By_$conta.f ]; then
-echo "File Forward/FWD_ALL_By_$conta.f is empty!"
 echo "0" > Forward/FWD_ALL_By_$conta.f
-else echo "File Forward/FWD_ALL_By_$conta.f isn't empty!" 
 fi
 awk -F" " 'END {if($1=="0") {print NR==0} else {print NR}}' \
 Forward/FWD_ALL_By_$conta.f >> Forward/Forward_by_no.tr 
@@ -26,7 +34,6 @@ cat Forward/FWD_UNIQ_PKID.tr | awk -F " " 'END{print NR}' > \
 Forward/FWD_UNIQ_PKID_Number.tr
 cat Trace_Cleaned.tr | awk -F" " '{if($1=="r" && $4=="AGT"){{print \
 	$6}}}' > Forward/RCV.tr
-rm -v Forward/UNIQ_PKID_RCV_F.tr
 cat Forward/RCV.tr | awk -F " " '{print}' > Forward/UNIQ_PKID_RCV_F.tr
 cat Forward/FWD_UNIQ_PKID.tr | awk -F " " '{print}' >> Forward/UNIQ_PKID_RCV_F.tr	
 sort -n Forward/UNIQ_PKID_RCV_F.tr | uniq -d > Forward/FWD_Effective.tr 
