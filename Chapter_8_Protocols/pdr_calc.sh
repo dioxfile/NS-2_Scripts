@@ -1,10 +1,15 @@
-#!/bin/bash
-mkdir -pv PDR
-cat Trace_Cleaned_AODV.tr | sed 's/\[//g' | sed 's/\]//g' | sed 's/\_//g' \
-| sed 's/\:/ /g' \
-| awk -F" " '{ {if($2 <= 60.000000000) {print}}}' > Trace_Cleaned_Sujo.tr 
-cat Trace_Cleaned_Sujo.tr | uniq > Trace_Cleaned.tr
-egrep "^[sr].*AGT.*" Trace_Cleaned.tr > Trace_R_S.tr 
+#!/bin/dash
+FILE="$1"
+NODE_N="$2"
+if [ -z "$FILE" ]; then
+  echo "USAGE: ./pdr_calc.sh <FILE.tr> <NODE_N>"
+  exit 1
+fi
+rm -r PDR/
+mkdir -pv PDR/
+cat $FILE | sed 's/\[//g' | sed 's/\]//g' | sed 's/\_//g' \
+| sed 's/\:/ /g' > Trace_Cleaned.tr
+egrep "^[sr].*AGT" Trace_Cleaned.tr > Trace_R_S.tr 
 cat Trace_R_S.tr | awk -F " " '{   
 	if($1 == "s" && $4 == "AGT"){
 		{print}		
