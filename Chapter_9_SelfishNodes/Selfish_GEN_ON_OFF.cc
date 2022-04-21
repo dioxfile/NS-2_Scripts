@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 		float off_time;
 		float R_3;
 		float Simulation_Time;
-        std::stringstream ss; //Receive traffic file as a parameter
+                std::stringstream ss; //Receive traffic file as a parameter
 		srand(time(NULL)); //Avoids biased seed distribution 
 		NSelfish = atoi(argv[1]);
 		INTERVALO = atoi(argv[2]);
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
         ///Verify who are the TX-RX nodes
         ss << "./SEL_DASH.sh " << traffic_file;
         system(ss.str().c_str());
-		string line;
+	string line;
         int elements[100];
         int num_line = 0;
         ifstream myfile ("TX_RX_Nodes.txt");
