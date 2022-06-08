@@ -21,7 +21,7 @@ if [ -z "$RATE" ]; then
 fi
 while [ "$sort" != "$MC/$MC" ]
 do
-	ns cbrgen.tcl -type cbr -nn $NN -seed $SEED -mc $MC -rate $RATE > traffic.tcl
+  ns cbrgen.tcl -type cbr -nn $NN -seed $SEED -mc $MC -rate $RATE > traffic.tcl
   export sort=$(cat traffic.tcl | egrep "#Total " | awk -F" " '{if($3=="'$MC/$MC'") {print $3}}')
   echo $sort
 done
