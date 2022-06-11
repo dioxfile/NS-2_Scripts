@@ -114,16 +114,3 @@ $ns_ at $val(termina).001 "$ns_ nam-end-wireless $val(termina)"
 $ns_ at $val(termina).002 "puts \"END SIMULATION...\"; final"
 $ns_ at $val(termina).003 "$ns_ halt"
 $ns_ run
-© 2022 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
