@@ -16,14 +16,14 @@
   } else {
   set val(drop)            Queue/DropTail/PriQueue   ;# FIFO Drop Queue
   }                                                  
-  set val(node_)             50                      ;# Node Number
+  set val(node_)             10                      ;# Node Number
   set val(x)               1000                      ;# Axis X 
   set val(y)               1000                      ;# Axis Y
   set val(TX)                 1.2W                   ;# Default NS2 - 0.400 -> 0,000509W/PKT
   set val(RX)                 0.6W                   ;# Default NS2 - 0.300 -> 0.000156W/PKT 
   set val(IniEner)          100.00                   ;# Initial Energy
   set val(ModEner)         EnergyModel               ;# Energy Model
-  set val(termina)           60                      ;# Simulation Time
+  set val(termina)           50                      ;# Simulation Time
 #======================================================================#
 
 # ---------------------BEGIN OLSR EXTENSIONS----------------------------
@@ -85,8 +85,8 @@ for {set i 0} {$i < $val(node_)} {incr i} {
 }
 
 ################Starting Mobility Model and Traffic Model###############
-puts "Starting Random WayPoint (eg., file mobility.tcl)."
-source "mobility.tcl" 
+#puts "Starting Random WayPoint (eg., file mobility.tcl)."
+source "10-nodes-statics.tcl" 
 puts "Starting Traffic"
 source "traffic.tcl"
 
