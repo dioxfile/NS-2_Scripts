@@ -72,7 +72,7 @@ $ns_ node-config -adhocRouting $val(routP) \
 		-movementTrace OFF \
 		-energyModel $val(ModEner) \
 		-initialEnergy $val(IniEner) \
-		-wiredRouting OFF \
+		-wiredRouting ON \
 		-rxPower $val(RX) \
 		-txPower $val(TX) 
 			
