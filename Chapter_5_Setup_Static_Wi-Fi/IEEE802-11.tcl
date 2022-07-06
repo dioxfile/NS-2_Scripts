@@ -86,7 +86,7 @@ for {set i 0} {$i < $val(node_)} {incr i} {
 
 ################Starting Mobility Model and Traffic Model###############
 puts "Starting Random WayPoint (eg., if traffic file is mobility.tcl)."
-source "10-nodes_statics.tcl" 
+source "10_Nodes_Wi-Fi_statics.tcl" 
 puts "Starting Traffic"
 source "traffic.tcl"
 
