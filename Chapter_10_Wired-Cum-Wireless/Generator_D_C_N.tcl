@@ -38,7 +38,7 @@ puts $id "#"
                            if {$nodes < 1 } {
                                puts "Invalid Option the minimum number of nodes must be equal to 1"
                            } else {
-                                  set x " set lista \{"
+                                  set x " set list \{"
                                   for {set n 0} {$n < $nodes} { incr n} {
                                    append x "$d.$c.$n "
                                   }
