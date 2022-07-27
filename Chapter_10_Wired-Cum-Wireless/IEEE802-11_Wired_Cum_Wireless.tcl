@@ -16,23 +16,24 @@
   } else {
   set val(drop)            Queue/DropTail/PriQueue   ;# FIFO Drop Queue
   }                                                  
-  set val(node_)             10                      ;# Node Number Wi-Fi 
-  set val(x)               1000                      ;# Axis X 
-  set val(y)               1000                      ;# Axis Y
+  set val(node_)             50                      ;# Node Number Wi-Fi Domain 2
+  set val(x)               1000.0                    ;# Axis X 
+  set val(y)                540.0                    ;# Axis Y
   set val(TX)                 1.2W                   ;# Default NS2 - 0.400 -> 0,000509W/PKT
   set val(RX)                 0.6W                   ;# Default NS2 - 0.300 -> 0.000156W/PKT 
   set val(IniEner)          100.00                   ;# Initial Energy
   set val(ModEner)         EnergyModel               ;# Energy Model
-  set val(termina)           60                      ;# Simulation Time
-  set val(wired)              5                      ;# Define nodes in LAN (Local Area Network)
-  set val(B_station)          1                      ;# Define Access Points in model simulation
+  set val(termina)          100                      ;# Simulation Time
+  set val(wired_0)            2                      ;# Define nodes in LAN Domain 0
+  set val(wired_1)            2                      ;# Define nodes in LAN Domain 1
+  set val(B_station)          2                      ;# Define Access Points Domain 2
 #======================================================================#
 
 # ---------------------BEGIN OLSR EXTENSIONS----------------------------
 source "olsr-default.tcl"
 
 # NIC Specification Ex. 802.11a, 802.11b, etc.
-source "802-11b_functional.tcl"
+source "802-11b_functional_final.tcl"
 
 #begin Simulation
 set ns_ [new Simulator]
@@ -40,10 +41,10 @@ $defaultRNG seed NEW_SEED
 
 #Setup Wired-Cum-Wireless (WCW)
 $ns_ node-config -addressType hierarchical   ;# Hierarquical Address
-AddrParams set domain_num_ 2                 ;# Domain Number (wired/wireless)
-lappend cluster_num 1 1                      ;# Cluster Number by Domain
+AddrParams set domain_num_ 3                 ;# Domain Number (wired/wireless)
+lappend cluster_num 1 1 1                    ;# Cluster Number by Domain
 AddrParams set cluster_num_ $cluster_num
-lappend eilastlevel 5 11                     ;# Node Number by Cluster
+lappend eilastlevel 2 2 52                   ;# Node Number by Cluster
 AddrParams set nodes_num_ $eilastlevel
 
 # Trace File Writing
@@ -57,10 +58,10 @@ $ns_ namtrace-all-wireless $ArquivoNam $val(x) $val(y)
 
 # Topology
 set topologia [new Topography]
-$topologia  load_flatgrid $val(x) $val(y)
+$topologia load_flatgrid $val(x) $val(y)
 
 # "GOD (General Operations Director)"
-set god_ [create-god [expr $val(node_) + $val(B_station)] ]
+set god_ [ create-god [ expr $val(node_) + $val(B_station) ] ]
 
 #Starting Channel 1
 set chan_11_ [new $val(canal)]
@@ -86,62 +87,110 @@ $ns_ node-config -adhocRouting $val(routP) \
 		-rxPower $val(RX) \
 		-txPower $val(TX) 
 
-# Creating Wired Nodes
-set Ethernet {0.0.0 0.0.1 0.0.2 0.0.3 0.0.4}
-for {set i 0} {$i < $val(wired)} {incr i} {
-set WN($i) [$ns_ node [lindex $Ethernet $i]]
-    $WN($i) color red
-    $ns_ at 0.0 "$WN($i) color red"
-    $ns_ at 0.0 "$WN($i) label Ether$i"
+# Creating Wired Nodes (Domain 0)
+set Ethernet0 { 0.0.0 0.0.1 }
+for {set i 0} {$i < $val(wired_0)} {incr i} {
+set WN0($i) [$ns_ node [lindex $Ethernet0 $i]]
+    $WN0($i) color red
+    $ns_ at 0.0 "$WN0($i) color red"
+    $ns_ at 0.0 "$WN0($i) label Ether$i"
 }
-	
+#Wired Node Position Domain 0
+$WN0(0) set X_ 324.290
+$WN0(0) set Y_ 328.499
+$WN0(0) set Z_ 0.0
+$WN0(1) set X_ 344.931
+$WN0(1) set Y_ 278.145
+$WN0(1) set Z_ 0.0
+
+# Creating Wired Nodes (Domain 0)
+set Ethernet1 { 1.0.0 1.0.1 }
+for {set i 0} {$i < $val(wired_1)} {incr i} {
+set WN1($i) [$ns_ node [lindex $Ethernet1 $i]]
+    $WN1($i) color red
+    $ns_ at 0.0 "$WN1($i) color red"
+    $ns_ at 0.0 "$WN1($i) label Ether$i"
+}
+#Wired Node Position DOmain 1
+$WN1(0) set X_ 938.142
+$WN1(0) set Y_ 414.229
+$WN1(0) set Z_ 0.0
+$WN1(1) set X_ 972.138
+$WN1(1) set Y_ 374.162
+$WN1(1) set Z_ 0.0
+
 # Creating Wireless Nodes 
-set wireless { 1.0.0 1.0.1 1.0.2 1.0.3 1.0.4 1.0.5 1.0.6 1.0.7 1.0.8 1.0.9 1.0.10 }
-# Setting AP as first node and AP position
-set AP(0) [ $ns_ node [lindex $wireless 0] ]
-$AP(0) color blue
-$ns_ at 0.0 "$AP(0) color blue"
+set wireless { 2.0.0 2.0.1 2.0.2 2.0.3 2.0.4 2.0.5 2.0.6 2.0.7 2.0.8 2.0.9 
+	 2.0.10 2.0.11 2.0.12 2.0.13 2.0.14 2.0.15 2.0.16 2.0.17 2.0.18 2.0.19 
+	 2.0.20 2.0.21 2.0.22 2.0.23 2.0.24 2.0.25 2.0.26 2.0.27 2.0.28 2.0.29 
+	 2.0.30 2.0.31 2.0.32 2.0.33 2.0.34 2.0.35 2.0.36 2.0.37 2.0.38 2.0.39 
+	 2.0.40 2.0.41 2.0.42 2.0.43 2.0.44 2.0.45 2.0.46 2.0.47 2.0.48 2.0.49 
+	 2.0.50 2.0.51 }
+	 
+# Setting AP(0) as first node and AP position
+set AP(0) [ $ns_ node [ lindex $wireless 0 ] ]
+$AP(0) color black
+$ns_ at 0.0 "$AP(0) color black"
 $ns_ at 0.0 "$AP(0) label Access_Point"
-$AP(0) random-motion 0 ;# disable
-$AP(0) set X_ 350.0
-$AP(0) set Y_ 350.0
+$AP(0) set X_ 361.0
+$AP(0) set Y_ 312.0
 $AP(0) set Z_ 0.0
+$AP(0) random-motion 0 ;# disable
+
+# Setting AP(1) as last node and AP position
+set AP(1) [ $ns_ node [ lindex $wireless 1 ] ]
+$AP(1) color black
+$ns_ at 0.0 "$AP(1) color black"
+$ns_ at 0.0 "$AP(1) label Access_Point"
+$AP(1) set X_ 926.0
+$AP(1) set Y_ 415.3
+$AP(1) set Z_ 0.0
+$AP(1) random-motion 0 ;# disable
 
 # Disable wired routing for Wi-Fi Nodes
 $ns_ node-config -wiredRouting OFF
-for {set i 0} {$i < $val(node_)} {incr i} {
-	set node_($i) [$ns_ node [lindex $wireless [expr $i+1]]]
+for {set i 0} {$i < $val(node_) } {incr i} {
+	set node_($i) [ $ns_ node [ lindex $wireless [ expr $i+2 ] ] ]
 	$node_($i) color blue
     $ns_ at 0.0 "$node_($i) color blue"
     $ns_ at 0.0 "$node_($i) label Wlan$i"
     # Provide each wireless node with the Access Point identification address
     $node_($i) base-station [AddrParams addr2id [$AP(0) node-addr]]
+    $node_($i) base-station [AddrParams addr2id [$AP(1) node-addr]]
     $node_($i) random-motion 0 ;# disable
 }
 
-#Creating a FullDuplex connection between the Access Point and the wired Nodes
-$ns_ duplex-link $WN(0) $AP(0) 100Mb 2ms DropTail
-$ns_ duplex-link $WN(1) $AP(0) 100Mb 2ms DropTail
-$ns_ duplex-link $WN(2) $AP(0) 100Mb 2ms DropTail
-$ns_ duplex-link $WN(3) $AP(0) 100Mb 2ms DropTail
-$ns_ duplex-link $WN(4) $AP(0) 100Mb 2ms DropTail
+#Creating a FullDuplex connection between the AP(0) and the wired Nodes
+$ns_ duplex-link $WN0(0) $AP(0) 5Mb 2ms DropTail
+$ns_ duplex-link $WN0(1) $AP(0) 5Mb 2ms DropTail
 #Direction of the flows between the AP and the Wired nodes
-$ns_ duplex-link-op $WN(0)   $AP(0) orient left-up
-$ns_ duplex-link-op $WN(1)   $AP(0) orient left-up
-$ns_ duplex-link-op $WN(2)   $AP(0) orient left-up
-$ns_ duplex-link-op $WN(3)   $AP(0) orient left-up
-$ns_ duplex-link-op $WN(4)   $AP(0) orient left-up
-$ns_ duplex-link-op $WN(0)   $AP(0) orient left-down
-$ns_ duplex-link-op $WN(1)   $AP(0) orient left-down
-$ns_ duplex-link-op $WN(2)   $AP(0) orient left-down
-$ns_ duplex-link-op $WN(3)   $AP(0) orient left-down
-$ns_ duplex-link-op $WN(4)   $AP(0) orient left-down
+$ns_ duplex-link-op $WN0(0) $AP(0) orient left-up
+$ns_ duplex-link-op $WN0(1) $AP(0) orient left-up
+$ns_ duplex-link-op $WN0(0) $AP(0) orient right-up
+$ns_ duplex-link-op $WN0(1) $AP(0) orient right-up
+$ns_ duplex-link-op $WN0(0) $AP(0) orient left-down
+$ns_ duplex-link-op $WN0(1) $AP(0) orient left-down
+$ns_ duplex-link-op $WN0(0) $AP(0) orient right-down
+$ns_ duplex-link-op $WN0(1) $AP(0) orient right-down
+
+#Creating a FullDuplex connection between the AP(1) and the wired Nodes
+$ns_ duplex-link $WN1(0) $AP(1) 5Mb 2ms DropTail
+$ns_ duplex-link $WN1(1) $AP(1) 5Mb 2ms DropTail
+#Direction of the flows between the AP and the Wired nodes
+$ns_ duplex-link-op $WN1(0) $AP(1) orient left-up
+$ns_ duplex-link-op $WN1(1) $AP(1) orient left-up
+$ns_ duplex-link-op $WN1(0) $AP(1) orient right-up
+$ns_ duplex-link-op $WN1(1) $AP(1) orient right-up
+$ns_ duplex-link-op $WN1(0) $AP(1) orient left-down
+$ns_ duplex-link-op $WN1(1) $AP(1) orient left-down
+$ns_ duplex-link-op $WN1(0) $AP(1) orient right-down
+$ns_ duplex-link-op $WN1(1) $AP(1) orient right-down
 
 ################Starting Mobility Model and Traffic Model###############
 puts "Starting Random WayPoint (eg., file mobility.tcl)."
-source "mobility-wcw.tcl" 
+source "mobility-wcw-final.tcl" 
 puts "Starting Traffic"
-source "traffic_wcw.tcl"
+source "traffic-wcw-final.tcl"
 
 # NAM Position 
 for {set n 0} {$n < $val(node_) } {incr n} {
@@ -150,12 +199,19 @@ for {set n 0} {$n < $val(node_) } {incr n} {
 
 # Stop nodes simulation
 for {set n 0} {$n < $val(node_) } {incr n} {
- $ns_ at $val(termina).000 "$node_($n) reset";
+ $ns_ at $val(termina).0001 "$node_($n) reset";
 }
 
-for {set n 0} {$n < $val(wired) } {incr n} {
- $ns_ at $val(termina).0001 "$WN($n) reset";
+for {set n 0} {$n < $val(wired_0) } {incr n} {
+ $ns_ at $val(termina).0001 "$WN0($n) reset";
 }
+
+for {set n 0} {$n < $val(wired_1) } {incr n} {
+ $ns_ at $val(termina).0001 "$WN1($n) reset";
+}
+
+$ns_ at $val(termina).0001 "$AP(0) reset";
+$ns_ at $val(termina).0001 "$AP(1) reset";
 
 proc final {} {
 global ns_ ArquivoTrace ArquivoNam val geral
