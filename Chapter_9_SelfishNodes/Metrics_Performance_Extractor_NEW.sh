@@ -98,7 +98,7 @@ echo "End of Throughput Calculation..."
 echo "Start Energy Calculation..."
 mkdir -pv Energy
 for conta in $(seq 0 $NODE_N); do
-egrep "^[sr].*" Trace_Cleaned.tr | awk -F" " '{if($3=="'$conta'"){{print $14 }}}' > Energy/Energia_All_by_$conta.e
+egrep "^[N].*" Trace_Cleaned.tr | awk -F" " '{if($5=="'$conta'"){{print $7 }}}' > Energy/Energia_All_by_$conta.e
 cat Energy/Energia_All_by_$conta.e | awk 'END{ print 100-$1 }' > Energy/E_Consumption_by_Node_$conta.e
 cat Energy/E_Consumption_by_Node_$conta.e >> Energy/Average_Node.e   
 done;
