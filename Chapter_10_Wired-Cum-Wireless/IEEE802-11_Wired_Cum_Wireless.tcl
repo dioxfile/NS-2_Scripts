@@ -42,9 +42,9 @@ $defaultRNG seed NEW_SEED
 #Setup Wired-Cum-Wireless (WCW)
 $ns_ node-config -addressType hierarchical   ;# Hierarquical Address
 AddrParams set domain_num_ 3                 ;# Domain Number (wired/wireless)
-lappend cluster_num 1 1 1                    ;# Cluster Number by Domain
+lappend cluster_num 2 1 1                    ;# Cluster Number by Domain
 AddrParams set cluster_num_ $cluster_num
-lappend eilastlevel 2 2 52                   ;# Node Number by Cluster
+lappend eilastlevel 2 50 2 2                 ;# Node Number by Cluster
 AddrParams set nodes_num_ $eilastlevel
 
 # Trace File Writing
@@ -87,8 +87,8 @@ $ns_ node-config -adhocRouting $val(routP) \
 		-rxPower $val(RX) \
 		-txPower $val(TX) 
 
-# Creating Wired Nodes (Domain 0)
-set Ethernet0 { 0.0.0 0.0.1 }
+# Creating Wired Nodes (Domain 1)
+set Ethernet0 { 1.0.0 1.0.1 }
 for {set i 0} {$i < $val(wired_0)} {incr i} {
 set WN0($i) [$ns_ node [lindex $Ethernet0 $i]]
     $WN0($i) color red
@@ -103,15 +103,15 @@ $WN0(1) set X_ 344.931
 $WN0(1) set Y_ 278.145
 $WN0(1) set Z_ 0.0
 
-# Creating Wired Nodes (Domain 0)
-set Ethernet1 { 1.0.0 1.0.1 }
+# Creating Wired Nodes (Domain 2)
+set Ethernet1 { 2.0.0 2.0.1 }
 for {set i 0} {$i < $val(wired_1)} {incr i} {
 set WN1($i) [$ns_ node [lindex $Ethernet1 $i]]
     $WN1($i) color red
     $ns_ at 0.0 "$WN1($i) color red"
     $ns_ at 0.0 "$WN1($i) label Ether$i"
 }
-#Wired Node Position DOmain 1
+#Wired Node Position Dmain 1
 $WN1(0) set X_ 938.142
 $WN1(0) set Y_ 414.229
 $WN1(0) set Z_ 0.0
@@ -120,12 +120,11 @@ $WN1(1) set Y_ 374.162
 $WN1(1) set Z_ 0.0
 
 # Creating Wireless Nodes 
-set wireless { 2.0.0 2.0.1 2.0.2 2.0.3 2.0.4 2.0.5 2.0.6 2.0.7 2.0.8 2.0.9 
-	 2.0.10 2.0.11 2.0.12 2.0.13 2.0.14 2.0.15 2.0.16 2.0.17 2.0.18 2.0.19 
-	 2.0.20 2.0.21 2.0.22 2.0.23 2.0.24 2.0.25 2.0.26 2.0.27 2.0.28 2.0.29 
-	 2.0.30 2.0.31 2.0.32 2.0.33 2.0.34 2.0.35 2.0.36 2.0.37 2.0.38 2.0.39 
-	 2.0.40 2.0.41 2.0.42 2.0.43 2.0.44 2.0.45 2.0.46 2.0.47 2.0.48 2.0.49 
-	 2.0.50 2.0.51 }
+set wireless { 0.0.0 0.0.1 0.1.0 0.1.1 0.1.2 0.1.3 0.1.4 0.1.5 0.1.6 0.1.7 0.1.8 0.1.9 
+	 0.1.10 0.1.11 0.1.12 0.1.13 0.1.14 0.1.15 0.1.16 0.1.17 0.1.18 0.1.19 
+	 0.1.20 0.1.21 0.1.22 0.1.23 0.1.24 0.1.25 0.1.26 0.1.27 0.1.28 0.1.29 
+	 0.1.30 0.1.31 0.1.32 0.1.33 0.1.34 0.1.35 0.1.36 0.1.37 0.1.38 0.1.39 
+	 0.1.40 0.1.41 0.1.42 0.1.43 0.1.44 0.1.45 0.1.46 0.1.47 0.1.48 0.1.49 }
 	 
 # Setting AP(0) as first node and AP position
 set AP(0) [ $ns_ node [ lindex $wireless 0 ] ]
@@ -161,30 +160,31 @@ for {set i 0} {$i < $val(node_) } {incr i} {
 }
 
 #Creating a FullDuplex connection between the AP(0) and the wired Nodes
+$ns_ duplex-link $WN0(0) $WN0(1) 5Mb 2ms DropTail
+$ns_ duplex-link $WN0(1) $WN0(0) 5Mb 2ms DropTail
 $ns_ duplex-link $WN0(0) $AP(0) 5Mb 2ms DropTail
-$ns_ duplex-link $WN0(1) $AP(0) 5Mb 2ms DropTail
+#$ns_ duplex-link $WN0(1) $AP(0) 5Mb 2ms DropTail
 #Direction of the flows between the AP and the Wired nodes
-$ns_ duplex-link-op $WN0(0) $AP(0) orient left-up
-$ns_ duplex-link-op $WN0(1) $AP(0) orient left-up
-$ns_ duplex-link-op $WN0(0) $AP(0) orient right-up
-$ns_ duplex-link-op $WN0(1) $AP(0) orient right-up
-$ns_ duplex-link-op $WN0(0) $AP(0) orient left-down
-$ns_ duplex-link-op $WN0(1) $AP(0) orient left-down
+$ns_ duplex-link-op $WN0(0) $WN0(1) orient right-down
+$ns_ duplex-link-op $WN0(0) $WN0(1) orient left-up
+$ns_ duplex-link-op $WN0(1) $WN0(0) orient right-down
+$ns_ duplex-link-op $WN0(1) $WN0(0) orient left-up
 $ns_ duplex-link-op $WN0(0) $AP(0) orient right-down
-$ns_ duplex-link-op $WN0(1) $AP(0) orient right-down
+$ns_ duplex-link-op $WN0(0) $AP(0) orient left-up
 
 #Creating a FullDuplex connection between the AP(1) and the wired Nodes
+$ns_ duplex-link $WN1(0) $WN1(1) 5Mb 2ms DropTail
+$ns_ duplex-link $WN1(1) $WN1(0) 5Mb 2ms DropTail
 $ns_ duplex-link $WN1(0) $AP(1) 5Mb 2ms DropTail
-$ns_ duplex-link $WN1(1) $AP(1) 5Mb 2ms DropTail
+#$ns_ duplex-link $WN1(1) $AP(1) 5Mb 2ms DropTail
 #Direction of the flows between the AP and the Wired nodes
-$ns_ duplex-link-op $WN1(0) $AP(1) orient left-up
-$ns_ duplex-link-op $WN1(1) $AP(1) orient left-up
-$ns_ duplex-link-op $WN1(0) $AP(1) orient right-up
-$ns_ duplex-link-op $WN1(1) $AP(1) orient right-up
+$ns_ duplex-link-op $WN1(0) $WN1(1) orient left-down
+$ns_ duplex-link-op $WN1(0) $WN1(1) orient right-up
+$ns_ duplex-link-op $WN1(1) $WN1(0) orient left-down
+$ns_ duplex-link-op $WN1(1) $WN1(0) orient right-up
 $ns_ duplex-link-op $WN1(0) $AP(1) orient left-down
-$ns_ duplex-link-op $WN1(1) $AP(1) orient left-down
-$ns_ duplex-link-op $WN1(0) $AP(1) orient right-down
-$ns_ duplex-link-op $WN1(1) $AP(1) orient right-down
+$ns_ duplex-link-op $WN1(0) $AP(1) orient right-up
+
 
 ################Starting Mobility Model and Traffic Model###############
 puts "Starting Random WayPoint (eg., file mobility.tcl)."
