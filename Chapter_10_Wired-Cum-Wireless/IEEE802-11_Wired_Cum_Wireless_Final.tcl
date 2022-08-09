@@ -10,21 +10,22 @@
   set val(fileSize)          50                      ;# Queue size
   set val(wlan0)           Phy/WirelessPhy           ;# DSSS
   set val(mac)             Mac/802_11                ;# MAC Type
-  set val(routP)           AODV                      ;# Routing Protocol
+  set val(routP)           OLSR                      ;# Routing Protocol
  if { $val(routP) == "DSR" } {                       ;# Only DSR
   set val(drop)            CMUPriQueue		 
   } else {
   set val(drop)            Queue/DropTail/PriQueue   ;# FIFO Drop Queue
   }                                                  
   set val(node_)             50                      ;# Node Number Wi-Fi Domain 2
-  set val(x)               1000                      ;# Axis X 
-  set val(y)                540                      ;# Axis Y
+  set val(x)               1000.0                    ;# Axis X 
+  set val(y)                540.0                    ;# Axis Y
   set val(TX)                 1.2W                   ;# Default NS2 - 0.400 -> 0,000509W/PKT
   set val(RX)                 0.6W                   ;# Default NS2 - 0.300 -> 0.000156W/PKT 
   set val(IniEner)          100.00                   ;# Initial Energy
   set val(ModEner)         EnergyModel               ;# Energy Model
   set val(termina)          100                      ;# Simulation Time
-  set val(wired)              4                      ;# Define nodes in LAN Domain 0
+  set val(wired_0)            2                      ;# Define nodes in LAN Domain 0
+  set val(wired_1)            2                      ;# Define nodes in LAN Domain 1
   set val(B_station)          2                      ;# Define Access Points Domain 2
 #======================================================================#
 
@@ -40,10 +41,10 @@ $defaultRNG seed NEW_SEED
 
 #Setup Wired-Cum-Wireless (WCW)
 $ns_ node-config -addressType hierarchical   ;# Hierarquical Address
-AddrParams set domain_num_ 2                 ;# Domain Number (wired/wireless)
-lappend cluster_num 1 1                      ;# Cluster Number by Domain
+AddrParams set domain_num_ 3                 ;# Domain Number (wired/wireless)
+lappend cluster_num 2 1 1                    ;# Cluster Number by Domain
 AddrParams set cluster_num_ $cluster_num
-lappend eilastlevel 4 52                     ;# Node Number by Cluster
+lappend eilastlevel 2 50 2 2                 ;# Node Number by Cluster
 AddrParams set nodes_num_ $eilastlevel
 
 # Trace File Writing
@@ -57,7 +58,7 @@ $ns_ namtrace-all-wireless $ArquivoNam $val(x) $val(y)
 
 # Topology
 set topologia [new Topography]
-$topologia  load_flatgrid $val(x) $val(y)
+$topologia load_flatgrid $val(x) $val(y)
 
 # "GOD (General Operations Director)"
 set god_ [ create-god [ expr $val(node_) + $val(B_station) ] ]
@@ -86,25 +87,47 @@ $ns_ node-config -adhocRouting $val(routP) \
 		-rxPower $val(RX) \
 		-txPower $val(TX) 
 
-# Creating Wired Nodes (Domain 0)
-set Ethernet { 0.0.0 0.0.1 0.0.2 0.0.3 }
-for {set i 0} {$i < $val(wired)} {incr i} {
-set WN($i) [$ns_ node [lindex $Ethernet $i]]
-    $WN($i) color red
-    $ns_ at 0.0 "$WN($i) color red"
-    $ns_ at 0.0 "$WN($i) label Ether$i"
+# Creating Wired Nodes (Domain 1)
+set Ethernet0 { 1.0.0 1.0.1 }
+for {set i 0} {$i < $val(wired_0)} {incr i} {
+set WN0($i) [$ns_ node [lindex $Ethernet0 $i]]
+    $WN0($i) color red
+    $ns_ at 0.0 "$WN0($i) color red"
+    $ns_ at 0.0 "$WN0($i) label Ether$i"
 }
+#Wired Node Position (Domain 1)
+$WN0(0) set X_ 324.290
+$WN0(0) set Y_ 328.499
+$WN0(0) set Z_ 0.0
+$WN0(1) set X_ 344.931
+$WN0(1) set Y_ 278.145
+$WN0(1) set Z_ 0.0
 
-# Creating Wireless Nodes 
-set wireless { 1.0.0 1.0.1 1.0.2 1.0.3 1.0.4 1.0.5 1.0.6 1.0.7 1.0.8 1.0.9 
-	 1.0.10 1.0.11 1.0.12 1.0.13 1.0.14 1.0.15 1.0.16 1.0.17 1.0.18 1.0.19 
-	 1.0.20 1.0.21 1.0.22 1.0.23 1.0.24 1.0.25 1.0.26 1.0.27 1.0.28 1.0.29 
-	 1.0.30 1.0.31 1.0.32 1.0.33 1.0.34 1.0.35 1.0.36 1.0.37 1.0.38 1.0.39 
-	 1.0.40 1.0.41 1.0.42 1.0.43 1.0.44 1.0.45 1.0.46 1.0.47 1.0.48 1.0.49 
-	 1.0.50 1.0.51 }
+# Creating Wired Nodes (Domain 2)
+set Ethernet1 { 2.0.0 2.0.1 }
+for {set i 0} {$i < $val(wired_1)} {incr i} {
+set WN1($i) [$ns_ node [lindex $Ethernet1 $i]]
+    $WN1($i) color red
+    $ns_ at 0.0 "$WN1($i) color red"
+    $ns_ at 0.0 "$WN1($i) label Ether$i"
+}
+#Wired Node Position (Domain 2)
+$WN1(0) set X_ 938.142
+$WN1(0) set Y_ 414.229
+$WN1(0) set Z_ 0.0
+$WN1(1) set X_ 972.138
+$WN1(1) set Y_ 374.162
+$WN1(1) set Z_ 0.0
+
+# Creating Wireless Nodes (Domain 0)
+set wireless { 0.0.0 0.0.1 0.1.0 0.1.1 0.1.2 0.1.3 0.1.4 0.1.5 0.1.6 0.1.7 0.1.8 0.1.9 
+	 0.1.10 0.1.11 0.1.12 0.1.13 0.1.14 0.1.15 0.1.16 0.1.17 0.1.18 0.1.19 
+	 0.1.20 0.1.21 0.1.22 0.1.23 0.1.24 0.1.25 0.1.26 0.1.27 0.1.28 0.1.29 
+	 0.1.30 0.1.31 0.1.32 0.1.33 0.1.34 0.1.35 0.1.36 0.1.37 0.1.38 0.1.39 
+	 0.1.40 0.1.41 0.1.42 0.1.43 0.1.44 0.1.45 0.1.46 0.1.47 0.1.48 0.1.49 }
 	 
 # Setting AP(0) as first node and AP position
-set AP(0) [ $ns_ node [lindex $wireless 0] ]
+set AP(0) [ $ns_ node [ lindex $wireless 0 ] ]
 $AP(0) color black
 $ns_ at 0.0 "$AP(0) color black"
 $ns_ at 0.0 "$AP(0) label Access_Point"
@@ -114,19 +137,19 @@ $AP(0) set Z_ 0.0
 $AP(0) random-motion 0 ;# disable
 
 # Setting AP(1) as last node and AP position
-set AP(1) [ $ns_ node [lindex $wireless 1] ]
+set AP(1) [ $ns_ node [ lindex $wireless 1 ] ]
 $AP(1) color black
 $ns_ at 0.0 "$AP(1) color black"
 $ns_ at 0.0 "$AP(1) label Access_Point"
 $AP(1) set X_ 926.0
 $AP(1) set Y_ 415.3
 $AP(1) set Z_ 0.0
-#$AP(1) random-motion 0 ;# disable
+$AP(1) random-motion 0 ;# disable
 
 # Disable wired routing for Wi-Fi Nodes
 $ns_ node-config -wiredRouting OFF
 for {set i 0} {$i < $val(node_) } {incr i} {
-	set node_($i) [$ns_ node [lindex $wireless [expr $i+2]]]
+	set node_($i) [ $ns_ node [ lindex $wireless [ expr $i+2 ] ] ]
 	$node_($i) color blue
     $ns_ at 0.0 "$node_($i) color blue"
     $ns_ at 0.0 "$node_($i) label Wlan$i"
@@ -137,22 +160,31 @@ for {set i 0} {$i < $val(node_) } {incr i} {
 }
 
 #Creating a FullDuplex connection between the AP(0) and the wired Nodes
-$ns_ duplex-link $WN(0) $AP(0) 100Mb 2ms DropTail
-$ns_ duplex-link $WN(1) $AP(0) 100Mb 2ms DropTail
+$ns_ duplex-link $WN0(0) $WN0(1) 5Mb 2ms DropTail
+$ns_ duplex-link $WN0(1) $WN0(0) 5Mb 2ms DropTail
+$ns_ duplex-link $WN0(0) $AP(0) 5Mb 2ms DropTail
+#$ns_ duplex-link $WN0(1) $AP(0) 5Mb 2ms DropTail
 #Direction of the flows between the AP and the Wired nodes
-$ns_ duplex-link-op $WN(0) $AP(0) orient left-up
-$ns_ duplex-link-op $WN(1) $AP(0) orient left-up
-$ns_ duplex-link-op $WN(0) $AP(0) orient left-down
-$ns_ duplex-link-op $WN(1) $AP(0) orient left-down
+$ns_ duplex-link-op $WN0(0) $WN0(1) orient right-down
+$ns_ duplex-link-op $WN0(0) $WN0(1) orient left-up
+$ns_ duplex-link-op $WN0(1) $WN0(0) orient right-down
+$ns_ duplex-link-op $WN0(1) $WN0(0) orient left-up
+$ns_ duplex-link-op $WN0(0) $AP(0) orient right-down
+$ns_ duplex-link-op $WN0(0) $AP(0) orient left-up
 
 #Creating a FullDuplex connection between the AP(1) and the wired Nodes
-$ns_ duplex-link $WN(2) $AP(1) 100Mb 2ms DropTail
-$ns_ duplex-link $WN(3) $AP(1) 100Mb 2ms DropTail
+$ns_ duplex-link $WN1(0) $WN1(1) 5Mb 2ms DropTail
+$ns_ duplex-link $WN1(1) $WN1(0) 5Mb 2ms DropTail
+$ns_ duplex-link $WN1(0) $AP(1) 5Mb 2ms DropTail
+#$ns_ duplex-link $WN1(1) $AP(1) 5Mb 2ms DropTail
 #Direction of the flows between the AP and the Wired nodes
-$ns_ duplex-link-op $WN(2) $AP(1) orient left-up
-$ns_ duplex-link-op $WN(3) $AP(1) orient left-up
-$ns_ duplex-link-op $WN(2) $AP(1) orient left-down
-$ns_ duplex-link-op $WN(3) $AP(1) orient left-down
+$ns_ duplex-link-op $WN1(0) $WN1(1) orient left-down
+$ns_ duplex-link-op $WN1(0) $WN1(1) orient right-up
+$ns_ duplex-link-op $WN1(1) $WN1(0) orient left-down
+$ns_ duplex-link-op $WN1(1) $WN1(0) orient right-up
+$ns_ duplex-link-op $WN1(0) $AP(1) orient left-down
+$ns_ duplex-link-op $WN1(0) $AP(1) orient right-up
+
 
 ################Starting Mobility Model and Traffic Model###############
 puts "Starting Random WayPoint (eg., file mobility.tcl)."
@@ -170,8 +202,12 @@ for {set n 0} {$n < $val(node_) } {incr n} {
  $ns_ at $val(termina).0001 "$node_($n) reset";
 }
 
-for {set n 0} {$n < $val(wired) } {incr n} {
- $ns_ at $val(termina).0001 "$WN($n) reset";
+for {set n 0} {$n < $val(wired_0) } {incr n} {
+ $ns_ at $val(termina).0001 "$WN0($n) reset";
+}
+
+for {set n 0} {$n < $val(wired_1) } {incr n} {
+ $ns_ at $val(termina).0001 "$WN1($n) reset";
 }
 
 $ns_ at $val(termina).0001 "$AP(0) reset";
