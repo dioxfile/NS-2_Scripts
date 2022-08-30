@@ -10,11 +10,11 @@
   set val(fileSize)          50                      ;# Queue size
   set val(wlan0)           Phy/WirelessPhy           ;# DSSS
   set val(mac)             Mac/802_11                ;# MAC Type
-  set val(routP)           OLSR                      ;# Routing Protocol
- if { $val(routP) == "DSR" } {                       ;# Only DSR
-  set val(drop)            CMUPriQueue		 
+  set val(routP)           AODV                      ;# Routing Protocol
+  if { $val(routP) == "DSR" } {                      ;# Only DSR
+     set val(drop)           CMUPriQueue		 
   } else {
-  set val(drop)            Queue/DropTail/PriQueue   ;# FIFO Drop Queue
+     set val(drop)           Queue/DropTail/PriQueue ;# FIFO Drop Queue
   }                                                  
   set val(node_)             50                      ;# Node Number Wi-Fi Domain 2
   set val(x)               1000.0                    ;# Axis X 
@@ -41,10 +41,10 @@ $defaultRNG seed NEW_SEED
 
 #Setup Wired-Cum-Wireless (WCW)
 $ns_ node-config -addressType hierarchical   ;# Hierarquical Address
-AddrParams set domain_num_ 3                 ;# Domain Number (wired/wireless)
-lappend cluster_num 2 1 1                    ;# Cluster Number by Domain
+AddrParams set domain_num_ 2                 ;# Domain Number (wired/wireless)
+lappend cluster_num 1 2                      ;# Cluster Number by Domain
 AddrParams set cluster_num_ $cluster_num
-lappend eilastlevel 2 50 2 2                 ;# Node Number by Cluster
+lappend eilastlevel 52 2 2                   ;# Node Number by Cluster
 AddrParams set nodes_num_ $eilastlevel
 
 # Trace File Writing
@@ -103,15 +103,15 @@ $WN0(1) set X_ 344.931
 $WN0(1) set Y_ 278.145
 $WN0(1) set Z_ 0.0
 
-# Creating Wired Nodes (Domain 2)
-set Ethernet1 { 2.0.0 2.0.1 }
+# Creating Wired Nodes (Domain 1)
+set Ethernet1 { 1.1.0 1.1.1 }
 for {set i 0} {$i < $val(wired_1)} {incr i} {
 set WN1($i) [$ns_ node [lindex $Ethernet1 $i]]
     $WN1($i) color red
     $ns_ at 0.0 "$WN1($i) color red"
     $ns_ at 0.0 "$WN1($i) label Ether$i"
 }
-#Wired Node Position (Domain 2)
+#Wired Node Position (Domain 1)
 $WN1(0) set X_ 938.142
 $WN1(0) set Y_ 414.229
 $WN1(0) set Z_ 0.0
@@ -120,11 +120,12 @@ $WN1(1) set Y_ 374.162
 $WN1(1) set Z_ 0.0
 
 # Creating Wireless Nodes (Domain 0)
-set wireless { 0.0.0 0.0.1 0.1.0 0.1.1 0.1.2 0.1.3 0.1.4 0.1.5 0.1.6 0.1.7 0.1.8 0.1.9 
-	 0.1.10 0.1.11 0.1.12 0.1.13 0.1.14 0.1.15 0.1.16 0.1.17 0.1.18 0.1.19 
-	 0.1.20 0.1.21 0.1.22 0.1.23 0.1.24 0.1.25 0.1.26 0.1.27 0.1.28 0.1.29 
-	 0.1.30 0.1.31 0.1.32 0.1.33 0.1.34 0.1.35 0.1.36 0.1.37 0.1.38 0.1.39 
-	 0.1.40 0.1.41 0.1.42 0.1.43 0.1.44 0.1.45 0.1.46 0.1.47 0.1.48 0.1.49 }
+set wireless { 0.0.0 0.0.1 0.0.2 0.0.3 0.0.4 0.0.5 0.0.6 0.0.7 0.0.8 0.0.9 0.0.10 
+	           0.0.11 0.0.12 0.0.13 0.0.14 0.0.15 0.0.16 0.0.17 0.0.18 0.0.19 0.0.20 
+	           0.0.21 0.0.22 0.0.23 0.0.24 0.0.25 0.0.26 0.0.27 0.0.28 0.0.29 0.0.30 
+	           0.0.31 0.0.32 0.0.33 0.0.34 0.0.35 0.0.36 0.0.37 0.0.38 0.0.39 0.0.40 
+	           0.0.41 0.0.42 0.0.43 0.0.44 0.0.45 0.0.46 0.0.47 0.0.48 0.0.49 0.0.50 
+	           0.0.51 }
 	 
 # Setting AP(0) as first node and AP position
 set AP(0) [ $ns_ node [ lindex $wireless 0 ] ]
