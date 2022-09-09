@@ -6,16 +6,16 @@
   set val(propacacao)      Propagation/TwoRayGround  ;# Radio Propagation
   set val(antena)          Antenna/OmniAntenna       ;# Aerial (omni/straight)
   set val(layer2)          LL                        ;# Link Layer
-  set val(drop)            Queue/DropTail/PriQueue   ;# Queue type
   set val(fileSize)          50                      ;# Queue size
   set val(wlan0)           Phy/WirelessPhy           ;# DSSS
   set val(mac)             Mac/802_11                ;# MAC Type
-  set val(routP)           AODV                      ;# Routing Protocol
+  set val(routP)           DSDV                      ;# Routing Protocol
   if { $val(routP) == "DSR" } {                      ;# Only DSR
      set val(drop)           CMUPriQueue		 
   } else {
      set val(drop)           Queue/DropTail/PriQueue ;# FIFO Drop Queue
   }                                                  
+  
   set val(node_)             50                      ;# Node Number Wi-Fi Domain 2
   set val(x)               1000.0                    ;# Axis X 
   set val(y)                540.0                    ;# Axis Y
@@ -24,9 +24,9 @@
   set val(IniEner)          100.00                   ;# Initial Energy
   set val(ModEner)         EnergyModel               ;# Energy Model
   set val(termina)          100                      ;# Simulation Time
-  set val(wired_0)            2                      ;# Define nodes in LAN Domain 0
+  set val(wired_0)            2                      ;# Define nodes in LAN Domain 1
   set val(wired_1)            2                      ;# Define nodes in LAN Domain 1
-  set val(B_station)          2                      ;# Define Access Points Domain 2
+  set val(B_station)          2                      ;# Define Access Points Domain 0
 #======================================================================#
 
 # ---------------------BEGIN OLSR EXTENSIONS----------------------------
@@ -61,7 +61,7 @@ set topologia [new Topography]
 $topologia load_flatgrid $val(x) $val(y)
 
 # "GOD (General Operations Director)"
-set god_ [ create-god [ expr $val(node_) + $val(B_station) ] ]
+set god_ [ create-god [expr $val(node_) + $val(B_station)] ]
 
 #Starting Channel 1
 set chan_11_ [new $val(canal)]
@@ -126,7 +126,6 @@ set wireless { 0.0.0 0.0.1 0.0.2 0.0.3 0.0.4 0.0.5 0.0.6 0.0.7 0.0.8 0.0.9 0.0.1
 	           0.0.31 0.0.32 0.0.33 0.0.34 0.0.35 0.0.36 0.0.37 0.0.38 0.0.39 0.0.40 
 	           0.0.41 0.0.42 0.0.43 0.0.44 0.0.45 0.0.46 0.0.47 0.0.48 0.0.49 0.0.50 
 	           0.0.51 }
-	 
 # Setting AP(0) as first node and AP position
 set AP(0) [ $ns_ node [ lindex $wireless 0 ] ]
 $AP(0) color black
@@ -160,11 +159,12 @@ for {set i 0} {$i < $val(node_) } {incr i} {
     $node_($i) random-motion 0 ;# disable
 }
 
+
 #Creating a FullDuplex connection between the AP(0) and the wired Nodes
 $ns_ duplex-link $WN0(0) $WN0(1) 5Mb 2ms DropTail
 $ns_ duplex-link $WN0(1) $WN0(0) 5Mb 2ms DropTail
 $ns_ duplex-link $WN0(0) $AP(0) 5Mb 2ms DropTail
-#$ns_ duplex-link $WN0(1) $AP(0) 5Mb 2ms DropTail
+
 #Direction of the flows between the AP and the Wired nodes
 $ns_ duplex-link-op $WN0(0) $WN0(1) orient right-down
 $ns_ duplex-link-op $WN0(0) $WN0(1) orient left-up
@@ -177,7 +177,7 @@ $ns_ duplex-link-op $WN0(0) $AP(0) orient left-up
 $ns_ duplex-link $WN1(0) $WN1(1) 5Mb 2ms DropTail
 $ns_ duplex-link $WN1(1) $WN1(0) 5Mb 2ms DropTail
 $ns_ duplex-link $WN1(0) $AP(1) 5Mb 2ms DropTail
-#$ns_ duplex-link $WN1(1) $AP(1) 5Mb 2ms DropTail
+
 #Direction of the flows between the AP and the Wired nodes
 $ns_ duplex-link-op $WN1(0) $WN1(1) orient left-down
 $ns_ duplex-link-op $WN1(0) $WN1(1) orient right-up
