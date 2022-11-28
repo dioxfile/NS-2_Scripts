@@ -4,4 +4,4 @@
 ## Book cover in Kindle format
 ![alt text](https://github.com/dioxfile/NS-2_Scripts/blob/master/Capa_Kindle.png)
 ## Book cover in physical format
-![alt text](https://github.com/dioxfile/NS-2_Scripts/blob/master/Capa_physical.png
+![alt text](https://github.com/dioxfile/NS-2_Scripts/blob/master/Capa_physical.JPG
