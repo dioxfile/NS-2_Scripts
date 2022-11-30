@@ -30,7 +30,7 @@
 source "olsr-extension.tcl"
 
 # NIC Specification Ex. 802.11a, 802.11b, etc.
-source "802-11b_functional.tcl"
+source "802-11a_functional.tcl"
 
 #begin Simulation
 set ns_ [new Simulator]
