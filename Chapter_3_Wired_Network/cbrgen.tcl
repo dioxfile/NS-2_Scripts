@@ -106,7 +106,7 @@ proc create-cbr-connection { src dst } {
 proc create-tcp-connection { src dst } {
 	global rng cbr_cnt opt
 
-	set stime [$rng uniform 0.0 180.0]
+	set stime [$rng uniform 8.0 8.1]
 
 	puts "#\n# $src connecting to $dst at time $stime\n#"
 
@@ -114,10 +114,8 @@ proc create-tcp-connection { src dst } {
 		TCP \$node_($src) TCPSink \$node_($dst) 0\]";
 	puts "\$tcp_($cbr_cnt) set window_ 32"
 	puts "\$tcp_($cbr_cnt) set packetSize_ $opt(pktsize)"
-
+    puts "\$tcp_($cbr_cnt) set rate_ $opt(rate)kb"
 	puts "set ftp_($cbr_cnt) \[\$tcp_($cbr_cnt) attach-source FTP\]"
-
-
 	puts "\$ns_ at $stime \"\$ftp_($cbr_cnt) start\""
 
 	incr cbr_cnt
@@ -198,5 +196,4 @@ for {set i 0} {$i < $opt(nn) } {incr i} {
 }
 
 puts "#\n#Total sources/connections: $src_cnt/$cbr_cnt\n#"
-
 
