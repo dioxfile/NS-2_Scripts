@@ -27,7 +27,7 @@
 #======================================================================#
 
 # ---------------------BEGIN OLSR EXTENSIONS----------------------------
-#source "olsr-default.tcl"
+#source "olsr-extension.tcl"
 
 # NIC Specification Ex. 802.11a, 802.11b, etc.
 source "802-11b_functional.tcl"
