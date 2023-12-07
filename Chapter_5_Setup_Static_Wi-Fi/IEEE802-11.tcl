@@ -8,36 +8,36 @@
   set val(layer2)          LL                        ;# Link Layer
   set val(drop)            Queue/DropTail/PriQueue   ;# Queue type
   set val(fileSize)          50                      ;# Queue size
-  set val(wlan0)           Phy/WirelessPhyExt        ;# DSSS
-  set val(mac)             Mac/802_11Ext             ;# MAC Type
-  set val(routP)           OLSR                      ;# Routing Protocol
+  set val(wlan0)           Phy/WirelessPhy           ;# DSSS
+  set val(mac)             Mac/802_11                ;# MAC Type
+  set val(routP)           AODV                      ;# Routing Protocol
  if { $val(routP) == "DSR" } {                       ;# Only DSR
   set val(drop)            CMUPriQueue		 
   } else {
   set val(drop)            Queue/DropTail/PriQueue   ;# FIFO Drop Queue
   }                                                  
-  set val(node_)             10                      ;# Node Number
+  set val(node_)             3                      ;# Node Number
   set val(x)               1000                      ;# Axis X 
   set val(y)               1000                      ;# Axis Y
   set val(TX)                 1.2W                   ;# Default NS2 - 0.400 -> 0,000509W/PKT
   set val(RX)                 0.6W                   ;# Default NS2 - 0.300 -> 0.000156W/PKT 
   set val(IniEner)          100.00                   ;# Initial Energy
   set val(ModEner)         EnergyModel               ;# Energy Model
-  set val(termina)           50                      ;# Simulation Time
+  set val(termina)            50                     ;# Simulation Time
 #======================================================================#
 
 # ---------------------BEGIN OLSR EXTENSIONS----------------------------
-source "olsr-extension.tcl"
+#source "olsr-default.tcl"
 
 # NIC Specification Ex. 802.11a, 802.11b, etc.
-source "802-11a_functional.tcl"
+source "802-11b_functional.tcl"
 
 #begin Simulation
 set ns_ [new Simulator]
 $defaultRNG seed NEW_SEED
 
 # Trace File Writing
-set ArquivoTrace [open TRACE_Arquivo.tr w]
+set ArquivoTrace [open TRACE_FILE.tr w]
 $ns_ trace-all $ArquivoTrace
 
 # NAM File  Writing
@@ -72,23 +72,26 @@ $ns_ node-config -adhocRouting $val(routP) \
 		-movementTrace OFF \
 		-energyModel $val(ModEner) \
 		-initialEnergy $val(IniEner) \
-		-wiredRouting OFF 
-#		-rxPower $val(RX) \
-#		-txPower $val(TX) 
-		
+		-wiredRouting OFF \
+		-rxPower $val(RX) \
+		-txPower $val(TX) 
+			
 # Create Wireless Nodes
 for {set i 0} {$i < $val(node_)} {incr i} {
 	set node_($i) [$ns_ node]
-    $node_($i) color green
+	$node_($i) color blue
+    $ns_ at 0.0 "$node_($i) color blue"
     $ns_ at 0.0 "$node_($i) label WN_$i"
     $node_($i) random-motion 0 ;# disable
 }
 
 ################Starting Mobility Model and Traffic Model###############
-puts "Starting Random WayPoint (eg., if traffic file is mobility.tcl)."
-source "10_Nodes_Wi-Fi_statics.tcl" 
+puts "Starting Random WayPoint (eg., file mobility.tcl)."
+source "mobility.tcl" 
 puts "Starting Traffic"
 source "traffic.tcl"
+#puts "Start Selfish Nodes..."
+#source "Selfish_On_Off.tcl"
 
 # NAM Position 
 for {set n 0} {$n < $val(node_) } {incr n} {
