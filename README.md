@@ -8,4 +8,4 @@
 ### Part from The Book: "Network Lab with Network Simulator 2 (NS-2)."
 ## Book cover in physical format (English Edition)
 ![alt text](https://github.com/dioxfile/NS-2_Scripts/blob/master/Boo-ING-Bro.jpeg)
-## Link to buy this Book: [Network Lab with Network Simulator 2 (NS-2)](https://kdp.amazon.com/amazon-dp-action/us/dualbookshelf.marketplacelink/B0DC49FBSF).
+## Link to buy this Book: [Network Lab with Network Simulator 2 (NS-2)](https://www.amazon.com/dp/B0DC49FBSF).
